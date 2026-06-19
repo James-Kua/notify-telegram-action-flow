@@ -39,7 +39,9 @@ runs:
       shell: bash
       env:
         TZ: ${{ inputs.timezone }}
-      run: echo "CURRENT_DATETIME=$(date +'%d %b %Y, %I:%M%p [%A]')" >> $GITHUB_ENV
+      run: |
+        echo "CURRENT_DATETIME=$(date +'%d %b %Y, %I:%M%p [%A]')" >> $GITHUB_ENV
+        echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
     - name: Send telegram on success
       if: success()
@@ -54,15 +56,21 @@ runs:
 
           ⏰ *${{ env.CURRENT_DATETIME }}*
 
-          📂 ${{ github.head_ref || github.ref_name }}
+          📂 *Branch*: ${{ github.head_ref || github.ref_name }}
+          🔢 *Run*: #${{ github.run_number }}
+          🔖 *Commit*: `${{ env.SHORT_SHA }}`
 
-          🧑‍💻 *${{ github.actor }}* created commit: ${{ github.event.head_commit.message }}
+          👤 *Triggered by*: ${{ github.actor }}
+
+          🧑‍💻 *Commit message*:
+          ${{ github.event.head_commit.message }}
 
           🗂 *Changed files*:
           ${{ inputs.changed_files }}
 
           🎯 *Repository*: ${{ github.repository }}
-          
+
+          🔎 *Run details*: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           👍 *See changes*: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
 
     - name: Send telegram on failure
@@ -74,17 +82,23 @@ runs:
         format: ${{ inputs.message_format }}
         disable_web_page_preview: ${{ inputs.disable_preview }}
         message: |
-          ❌ Build failed!
+          ❌ *${{ inputs.workflow_name }}* failed!
 
           ⏰ *${{ env.CURRENT_DATETIME }}*
 
-          📂 ${{ github.head_ref || github.ref_name }}
+          📂 *Branch*: ${{ github.head_ref || github.ref_name }}
+          🔢 *Run*: #${{ github.run_number }}
+          🔖 *Commit*: `${{ env.SHORT_SHA }}`
 
-          🧑‍💻 *${{ github.actor }}* created commit: ${{ github.event.head_commit.message }}
+          👤 *Triggered by*: ${{ github.actor }}
+
+          🧑‍💻 *Commit message*:
+          ${{ github.event.head_commit.message }}
 
           🗂 *Changed files*:
           ${{ inputs.changed_files }}
 
           🎯 *Repository*: ${{ github.repository }}
-          
+
+          🔎 *Run details*: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           👍 *See changes*: https://github.com/${{ github.repository }}/commit/${{ github.sha }}

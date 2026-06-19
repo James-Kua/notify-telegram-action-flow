@@ -36,14 +36,20 @@ Sample telegram message
 
 ⏰ 30 Mar 2025, 04:38PM [Sunday]
 
-📂 main
+📂 Branch: main
+🔢 Run: #26
+🔖 Commit: `0aa0963`
 
-🧑‍💻 James-Kua created commit: Use new workflow (#26)
+👤 Triggered by: James-Kua
+
+🧑‍💻 Commit message:
+Use new workflow (#26)
 
 🗂 Changed files:
 .github/workflows/ci.yml   .github/workflows/storybook.yml
 
 🎯 Repository: James-Kua/RedditLite
 
+🔎 Run details: https://github.com/James-Kua/RedditLite/actions/runs/123456789
 👍 See changes: https://github.com/James-Kua/RedditLite/commit/0aa096308fefacf86cdf6a0e83416c9f6d3abf01
 ```
