@@ -35,13 +35,17 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set current datetime as env variable
+    - name: Format Telegram notification
+      id: notification
       shell: bash
       env:
         TZ: ${{ inputs.timezone }}
-      run: |
-        echo "CURRENT_DATETIME=$(date +'%d %b %Y, %I:%M%p [%A]')" >> $GITHUB_ENV
-        echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+        MESSAGE_FORMAT: ${{ inputs.message_format }}
+        COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        WORKFLOW_NAME: ${{ inputs.workflow_name }}
+        BRANCH: ${{ github.head_ref || github.ref_name }}
+        CHANGED_FILES: ${{ inputs.changed_files }}
+      run: python3 "$GITHUB_ACTION_PATH/format_notification.py"
 
     - name: Send telegram on success
       if: success()
@@ -52,26 +56,9 @@ runs:
         format: ${{ inputs.message_format }}
         disable_web_page_preview: ${{ inputs.disable_preview }}
         message: |
-          ✅ *${{ inputs.workflow_name }}* passed!
+          ✅ ${{ steps.notification.outputs.workflow }} passed!
 
-          ⏰ *${{ env.CURRENT_DATETIME }}*
-
-          📂 *Branch*: ${{ github.head_ref || github.ref_name }}
-          🔢 *Run*: #${{ github.run_number }}
-          🔖 *Commit*: `${{ env.SHORT_SHA }}`
-
-          👤 *Triggered by*: ${{ github.actor }}
-
-          🧑‍💻 *Commit message*:
-          ${{ github.event.head_commit.message }}
-
-          🗂 *Changed files*:
-          ${{ inputs.changed_files }}
-
-          🎯 *Repository*: ${{ github.repository }}
-
-          🔎 *Run details*: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          👍 *See changes*: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+          ${{ steps.notification.outputs.body }}
 
     - name: Send telegram on failure
       if: failure()
@@ -82,23 +69,6 @@ runs:
         format: ${{ inputs.message_format }}
         disable_web_page_preview: ${{ inputs.disable_preview }}
         message: |
-          ❌ *${{ inputs.workflow_name }}* failed!
+          ❌ ${{ steps.notification.outputs.workflow }} failed!
 
-          ⏰ *${{ env.CURRENT_DATETIME }}*
-
-          📂 *Branch*: ${{ github.head_ref || github.ref_name }}
-          🔢 *Run*: #${{ github.run_number }}
-          🔖 *Commit*: `${{ env.SHORT_SHA }}`
-
-          👤 *Triggered by*: ${{ github.actor }}
-
-          🧑‍💻 *Commit message*:
-          ${{ github.event.head_commit.message }}
-
-          🗂 *Changed files*:
-          ${{ inputs.changed_files }}
-
-          🎯 *Repository*: ${{ github.repository }}
-
-          🔎 *Run details*: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          👍 *See changes*: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+          ${{ steps.notification.outputs.body }}
